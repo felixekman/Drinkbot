@@ -22,7 +22,7 @@ Components for the build:
 
 8 pcs 10k Ohm 1/4th W Resistors (https://www.sparkfun.com/products/8374)
 
-8 pcs 1N4007 Diode MIC DO-41 1A 1000V Rectifie Diode
+8 pcs 1N4007 Diode MIC DO-41 1A 1000V Rectifier Diode
 
 1 pcs Voltage Regulator - 5V L7805 (https://www.sparkfun.com/products/107)
 
