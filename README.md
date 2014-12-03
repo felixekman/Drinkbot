@@ -1,7 +1,7 @@
 Drinkbot
 ========
 
-A newbies attempt at controlling a bunch of peristaltic pumps
+An attempt at controlling a bunch of peristaltic pumps
 
 I have ordered 8 Peristaltic Pumps. 12VDC 200-300mA
   https://www.adafruit.com/products/1150
