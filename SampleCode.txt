@@ -1,0 +1,44 @@
+int[] P = { 0, 0, 0, 0, 0, 0, 0, 0};  // milliseconds for each pump
+long time2start = 0;
+
+  
+void setup()
+{
+  Spark.function("setPumps", setPumps);
+}
+
+void loop()
+{
+  for (int i = 0; i < 8; i++)
+  {
+    if ((millis() - time2start) <= P[i])
+      doPumping(i);
+    else 
+      stopPumping(i);
+  }
+}
+
+int setPumps(String param)
+{
+  for (int i = 0; i < 8; i++)
+  {
+    int pumpingTime = 0;
+    // parse param and set desired time to run in milli seconds
+    P[i] = pumpingTime; 
+  }
+  
+  time2start = millis(); // start NOW
+
+  return (int)time2start;
+}
+
+void doPumping(int pumpNumber)
+{
+  // do something
+}
+
+void stopPumping(int pumpNumber)
+{
+  if (pumpRunning)
+    // do something to stop it
+}
