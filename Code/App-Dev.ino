@@ -48,7 +48,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "application.h"
-#include "neopixel/neopixel.h" //Neopixel RGBLED
+#include "neopixel/neopixel.h" //Neopixel RGBLED on pin D7
+#include "OneWire.h" //For the DS18B20 Temprature sensor on pin D4
 
 /* Definitions ---------------------------------------------------------------*/
 SYSTEM_MODE(AUTOMATIC);
