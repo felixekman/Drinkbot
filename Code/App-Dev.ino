@@ -306,6 +306,24 @@ int tinkerAnalogWrite(String command)
 }
 
 /*******************************************************************************
+ * Function Name  : RGBLEd
+ * Description    : Uses RGBLed port D7 to show on Led when drinks are done
+ *                  
+ * Input          : From Pump Process
+ * Output         : none
+ *******************************************************************************/
+ 
+// Fill the dots one after the other with a color
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+      strip.setPixelColor(i, c);
+      strip.show();
+      delay(wait);
+  }
+}
+
+
+/*******************************************************************************
  * Function Name  : drinkbotSetPumps
  * Description    : Setup and start the pumping jobs,
  *                  e.g. P0:xx;P1:xx;P2:xx;P3:xx;P4:xx;P5:xx;P6:xx;P7:xx
@@ -507,6 +525,8 @@ static void finishpumpjobs(int p[NPUMPS])
 	if (npumpson(pumpsStatus) == 0) {
 		Serial.print("All pumping jobs finished, time elapsed: ");
 		Serial.println(timeDelta);
+		colorWipe(strip.Color(0, 10, 0), 20); // Green
+		colorWipe(strip.Color(0, 0, 0), 20); // Black
 		changestate(STATE_LISTENING);
 	}
 }
