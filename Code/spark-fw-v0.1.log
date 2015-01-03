@@ -1,0 +1,48 @@
+Booting...
+change state: 0 -> 1
+drinkbotSetPumps, args: P0:10;P1:05;P2:10;P3:12;P4:00;P5:02;P6:04;P7:00
+pumpsOnVol: 10 5 10 12 0 2 4 0
+change state: 1 -> 2
+timeStart: 186035
+starting pumps: 0 1 2 3 5 6
+change state: 2 -> 3
+stoping pump: 5 in 2004ms
+stoping pump: 6 in 4005ms
+stoping pump: 1 in 5002ms
+stoping pump: 0 in 10005ms
+stoping pump: 2 in 10005ms
+stoping pump: 3 in 12005ms
+All pumping jobs finished, time elapsed: 12005
+change state: 3 -> 1
+drinkbotSetPumps, args: P0:10;P1:05;P2:10;P3:12;P4:00;P5:02;P6:04;P7:00
+pumpsOnVol: 10 5 10 12 0 2 4 0
+change state: 1 -> 2
+timeStart: 200900
+starting pumps: 0 1 2 3 5 6
+change state: 2 -> 3
+stoping pump: 5 in 2003ms
+stoping pump: 6 in 4005ms
+drinkbotSetPumps, args: P0:10;P1:05;P2:10;P3:12;P4:00;P5:02;P6:04;P7:00
+stoping pump: 1 in 5003ms
+stoping pump: 0 in 10003ms
+stoping pump: 2 in 10003ms
+stoping pump: 3 in 12004ms
+All pumping jobs finished, time elapsed: 12004
+change state: 3 -> 1
+drinkbotSetPumps, args: P0:10;P1:05;P2:10;P3:12;P4:01;P5:02;P6:04;P7:00
+pumpsOnVol: 10 5 10 12 1 2 4 0
+change state: 1 -> 2
+timeStart: 365672
+starting pumps: 0 1 2 3 4 5 6
+change state: 2 -> 3
+stoping pump: 4 in 1001ms
+stoping pump: 5 in 2002ms
+stoping pump: 6 in 4004ms
+stoping pump: 1 in 5001ms
+stoping pump: 0 in 10004ms
+stoping pump: 2 in 10004ms
+stoping pump: 3 in 12004ms
+All pumping jobs finished, time elapsed: 12004
+change state: 3 -> 1
+
+
