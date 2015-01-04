@@ -70,6 +70,7 @@ enum {
 #define PIXEL_COUNT 24
 #define PIXEL_TYPE WS2812B
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
 /* Variables -----------------------------------------------------------------*/
 static double temperature = 0.0;
@@ -115,6 +116,8 @@ void setup()
 	//Neopixel RGBLED
 	strip.begin();
 	strip.show(); // Initialize all pixels to 'off'
+	pixels.begin();
+	pixels.show();
 
 	//Register all the Tinker functions
 //	Spark.function("digitalread", tinkerDigitalRead);
@@ -193,8 +196,8 @@ void loop()
  
 // Fill the dots one after the other with a color
 void colorWipe(uint32_t c, uint8_t wait) {
-  for(uint16_t i=0; i<strip.numPixels(); i++) {
-      strip.setPixelColor(i, c);
+  for(uint16_t k=0; k<strip.numPixels(); k++) {
+      strip.setPixelColor(k, c);
       strip.show();
       delay(wait);
   }
@@ -365,6 +368,9 @@ static void startpumpjobs(int p[NPUMPS])
 			controlpump(i, true);
 			Serial.print(i);
 			Serial.print(' ');
+			pixels.show(); // Sends command to RGB Strip
+			pixels.setPixelColor(i * 3, pixels.Color(0,0,5)); // Turns on the related led on the RGB Strip
+			pixels.show(); // Sends command to RGB Strip
 		}
 	}
 	Serial.println("");
@@ -381,11 +387,12 @@ static int npumpson(int ps[NPUMPS])
 static void finishpumpjobs(int p[NPUMPS])
 {
 	int i;
+	
 	unsigned long timeDelta;
 
 	// FIXME
 	// support up to about 49 days for an unsigned long millis
-	// better to wrap around
+	// better to wrap around 
 	timeDelta = millis() - timeStart;
 
 	for (i = 0; i < NPUMPS; i++) {
@@ -393,6 +400,9 @@ static void finishpumpjobs(int p[NPUMPS])
 		    pumpsStatus[i] == 1) {
 			Serial.print("stoping pump: ");
 			Serial.print(i);
+			pixels.show(); // Sends command to RGB Strip
+			pixels.setPixelColor(i * 3, pixels.Color(0,0,0)); // Turns off the related led on the RGB Strip
+			pixels.show(); // Sends command to RGB Strip
 			Serial.print(" in ");
 			Serial.print(timeDelta);
 			Serial.println("ms");
