@@ -51,6 +51,7 @@
 #include "OneWire/OneWire.h"
 //#include "spark-dallas-temperature.h"
 #include "spark-dallas-temperature/spark-dallas-temperature.h"
+#include "neopixel/neopixel.h" //Neopixel RGBLED on pin D7
 #include <math.h>
 
 /* Definitions ---------------------------------------------------------------*/
@@ -71,6 +72,14 @@ enum {
 #define IO_ALCOH1	A3
 #define IO_ALCOH2	A2
 #define ALCOHOL_THRES	680	// reading value larger than this indicates alcohol sensor not ready
+//Neopixel RGBLED
+#define PIXEL_PIN D7
+#define PIXEL_COUNT 24
+#define PIXEL_TYPE WS2812B
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
+void rainbow(uint8_t wait);
+uint32_t Wheel(byte WheelPos);
 
 /* Variables -----------------------------------------------------------------*/
 static double temperature = 0.0;
@@ -111,13 +120,17 @@ void setup()
 	//Setup communication bus with secondary processor
 //	Serial1.begin(9600);
 
-	//Setup the Tinker application here
-	RGB.brightness(12);
+	//Neopixel RGBLED
+	strip.begin();
+	strip.show(); // Initialize all pixels to 'off'
+	pixels.begin();
+	pixels.show();
 
 	//Register all the Drinkbot functions
 	Spark.function("setpumps", drinkbotSetPumps);
 	Spark.function("debug", drinkbotDebug);
-
+	Spark.function("effects", drinkbotEffects);
+	
 	//Register all the Drinkbot variables
 	Spark.variable("temperature", &temperature, DOUBLE);
 	Serial.println("setup Dallas Temperature IC Control...");
@@ -186,6 +199,80 @@ void loop()
 }
 
 /*******************************************************************************
+ * Function Name  : RGBLEd
+ * Description    : Uses RGBLed port D7 to show on Led when drinks are done
+ *                  
+ * Input          : From Pump Process
+ * Output         : none
+ *******************************************************************************/
+ 
+// Fill the dots one after the other with a color
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t k=0; k<strip.numPixels(); k++) {
+      strip.setPixelColor(k, c);
+      strip.show();
+      delay(wait);
+  }
+}
+
+void rainbow(uint8_t wait) {
+  uint16_t k, j;
+
+  for(j=0; j<256; j++) {
+    for(k=0; k<strip.numPixels(); k++) {
+      strip.setPixelColor(k, Wheel((k+j) & 255));
+    }
+    strip.show();
+    delay(wait);
+  }
+}
+
+uint32_t Wheel(byte WheelPos) {
+  if(WheelPos < 85) {
+   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+  } else if(WheelPos < 170) {
+   WheelPos -= 85;
+   return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  } else {
+   WheelPos -= 170;
+   return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+}
+
+/*******************************************************************************
+ * Function Name  : drinkbotEffects
+ * Description    : This triggers various effects on the RGB Strip,
+ * Input          : effect name
+ * Output         : None.
+ * Return         : 0 for success, others for error numbers
+ *******************************************************************************/
+int drinkbotEffects(String command)
+{
+//	int i;
+
+	Serial.print(__func__);
+	Serial.print(", args: ");
+	Serial.println(command);
+
+	if (command.equals("colorWipe")) {
+		Serial.println("colorWipe Drinkbot...");
+		colorWipe(strip.Color(0, 0, 200), 20); // Blue
+		colorWipe(strip.Color(0, 0, 0), 20); // Black
+	}
+	
+    if (command.equals("rainbow")) {
+		Serial.println("Rainbow Drinkbot...");
+		rainbow(20);
+		delay(1000);
+		colorWipe(strip.Color(0, 0, 0), 20); // Black
+	}
+
+
+	Serial.println("dump all variables:");
+	return 0;
+}
+
+/*******************************************************************************
  * Function Name  : drinkbotSetPumps
  * Description    : Setup and start the pumping jobs,
  *                  e.g. P0:xx;P1:xx;P2:xx;P3:xx;P4:xx;P5:xx;P6:xx;P7:xx
@@ -242,6 +329,12 @@ int drinkbotDebug(String command)
 
 	if (command.equals("reset")) {
 		Serial.println("Resetting Drinkbot...");
+		RGB.control(true);
+		RGB.brightness(64);
+		RGB.color(255, 0, 0);
+		colorWipe(strip.Color(5, 0, 0), 20); // Red
+		colorWipe(strip.Color(0, 0, 0), 20); // Black
+		RGB.control(false);
 		for (i = 0; i < NPUMPS; i++)
 			controlpump(i, false);
 		changestate(STATE_BOOTING);
@@ -360,6 +453,12 @@ static void startpumpjobs(int p[NPUMPS])
 			controlpump(i, true);
 			Serial.print(i);
 			Serial.print(' ');
+			pixels.show(); // Sends command to RGB Strip
+			pixels.setPixelColor(i * 3, pixels.Color(0,0,5)); // Turns on the related led on the RGB Strip
+			RGB.control(true);
+			RGB.brightness(64);
+			RGB.color(0, 0, 255);
+			pixels.show(); // Sends command to RGB Strip
 		}
 	}
 	Serial.println("");
@@ -388,6 +487,12 @@ static void finishpumpjobs(int p[NPUMPS])
 		    pumpsStatus[i] == 1) {
 			Serial.print("stoping pump: ");
 			Serial.print(i);
+			pixels.show(); // Sends command to RGB Strip
+			pixels.setPixelColor(i * 3, pixels.Color(0,0,0)); // Turns off the related led on the RGB Strip
+			pixels.show(); // Sends command to RGB Strip
+			RGB.control(true);
+			RGB.brightness(64);
+			RGB.color(255, 0, 0);
 			Serial.print(" in ");
 			Serial.print(timeDelta);
 			Serial.println("ms");
@@ -398,7 +503,18 @@ static void finishpumpjobs(int p[NPUMPS])
 	if (npumpson(pumpsStatus) == 0) {
 		Serial.print("All pumping jobs finished, time elapsed: ");
 		Serial.println(timeDelta);
+		RGB.control(true);
+		RGB.color(0, 255, 0);
+		RGB.brightness(64);
+		colorWipe(strip.Color(0, 200, 0), 20); // Green
+		colorWipe(strip.Color(0, 0, 0), 20); // Black
+		colorWipe(strip.Color(0, 100, 0), 20); // Green
+		colorWipe(strip.Color(0, 0, 0), 20); // Black
+		colorWipe(strip.Color(0, 50, 0), 20); // Green
+		colorWipe(strip.Color(0, 0, 0), 20); // Black
+		colorWipe(strip.Color(0, 5, 0), 20); // Green
+		colorWipe(strip.Color(0, 0, 0), 20); // Black
+		RGB.control(false);
 		changestate(STATE_LISTENING);
 	}
 }
-
