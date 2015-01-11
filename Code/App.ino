@@ -47,10 +47,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "application.h"
-//#include "OneWire.h"
-#include "OneWire/OneWire.h"
-//#include "spark-dallas-temperature.h"
-#include "spark-dallas-temperature/spark-dallas-temperature.h"
+#include "OneWire.h"
+#include "spark-dallas-temperature.h"
 #include <math.h>
 
 /* Definitions ---------------------------------------------------------------*/
@@ -64,8 +62,19 @@ enum {
 	STATE_MAX,
 };
 
+#define SYSLOG(fmt) \
+	do { \
+		time_t now = Time.now(); \
+		char _buf[16]; \
+		sprintf(_buf, "%02d-%02d %02d:%02d:%2d", Time.month(now), Time.day(now), Time.hour(now), Time.minute(now), Time.second(now)); \
+		Serial.print('['); \
+		Serial.print(_buf); \
+		Serial.print("] "); \
+		Serial.println(fmt); \
+	} while (0);
+
 #define NPUMPS		8
-#define vol2time(vol)	((unsigned long)vol*1000)	// vol -> millis, to be fixed according to actual case
+#define vol2time(mpv, vol)	((unsigned long)mpv * vol)	// (millis needed per cl) * volume
 
 #define IO_TEMP		D4
 #define IO_ALCOH1	A3
@@ -77,10 +86,13 @@ static double temperature = 0.0;
 static double bac1 = 0.0;
 static double bac2 = 0.0;
 static int state = STATE_BOOTING;
-static int pumpsOnVol[NPUMPS] = {0, 0, 0, 0, 0, 0, 0, 0};	// unit: cl
+static int pumpsOnVol[NPUMPS] = {0, 0, 0, 0, 0, 0, 0, 0};	// cl
 static int pumpsStatus[NPUMPS] = {0, 0, 0, 0, 0, 0, 0, 0};	// 1: on, 0: off
 static unsigned long timeStart = 0;
 
+// TODO Amend this array to match the actual performance of each pump.
+static const int millisPerVol[NPUMPS] =
+	{1200, 900, 1000, 1000, 1000, 1000, 1000, 1000};	// millis needed to pump 1 cl
 static const int pump2io[NPUMPS] = {D0, D1, A0, A1, A4, A5, A6, A7};
 
 OneWire oneWire(IO_TEMP);
@@ -122,7 +134,6 @@ void setup()
 	Spark.variable("temperature", &temperature, DOUBLE);
 	Serial.println("setup Dallas Temperature IC Control...");
 	tsensor.begin();
-	tsensor.setResolution(12);
 
 	Spark.variable("bac1", &bac1, DOUBLE);
 	pinMode(A3, INPUT);
@@ -180,9 +191,10 @@ void loop()
 	 * FIXME This delay ensures the whole system won't be blocked.
 	 * Especially like virtual COM device, these guys will hang without
 	 * delay. But we need to provide a proper value so that there won't
-	 * be too much loss of the whole system efficiency.
+	 * be too much loss of the whole system efficiency, as well as the
+	 * timing accuracy.
 	 */
-	delay(100);
+	delay(10);
 }
 
 /*******************************************************************************
@@ -209,15 +221,18 @@ int drinkbotSetPumps(String command)
 	}
 
 	if (state != STATE_LISTENING) {
+		Serial.println("Busy... Command ignored.");
 		return -EBUSY;
 	}
 
 	/* parse command */
-	Serial.print("pumpsOnVol: ");
+	Serial.print("cl(ms/cl): ");
 	for (i = 0; i < NPUMPS; i++) {
 		pumpsOnVol[i] = parseparams(command, i);
 		Serial.print(pumpsOnVol[i]);
-		Serial.print(' ');
+		Serial.print('(');
+		Serial.print(millisPerVol[i]);
+		Serial.print(") ");
 	}
 	Serial.println("");
 
@@ -248,6 +263,7 @@ int drinkbotDebug(String command)
 	}
 
 
+	SYSLOG("show timestamp");
 	Serial.println("dump all variables:");
 
 	Serial.print("temperature: ");
@@ -384,14 +400,18 @@ static void finishpumpjobs(int p[NPUMPS])
 	timeDelta = millis() - timeStart;
 
 	for (i = 0; i < NPUMPS; i++) {
-		if (timeDelta > vol2time(p[i]) &&
+		if (timeDelta > vol2time(millisPerVol[i], p[i]) &&
 		    pumpsStatus[i] == 1) {
-			Serial.print("stoping pump: ");
+			controlpump(i, false);
+			Serial.print("stopped pump: ");
 			Serial.print(i);
 			Serial.print(" in ");
 			Serial.print(timeDelta);
-			Serial.println("ms");
-			controlpump(i, false);
+			Serial.print("ms for ");
+			Serial.print(p[i]);
+			Serial.print("cl at a speed of ");
+			Serial.print(millisPerVol[i]);
+			Serial.println("ms/cl");
 		}
 	}
 
@@ -401,4 +421,3 @@ static void finishpumpjobs(int p[NPUMPS])
 		changestate(STATE_LISTENING);
 	}
 }
-
