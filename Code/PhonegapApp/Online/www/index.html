@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+ 
+	<head> 
+	<title>Page Title</title> 
+	
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"> 
+
+			<link rel="stylesheet" href="css/jquery.mobile-1.4.2.css" />
+			<link rel="stylesheet" href="css/drinkbotcss.css" />
+			
+			<script  type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+			<script type="text/javascript" src="phonegap.js"></script>
+			<script type="text/javascript" src="js/jstorage.js"></script>
+			<script type="text/javascript">
+				$(document).bind("mobileinit", function() {
+					$.support.cors = true;
+					$.mobile.allowCrossDomainPages = true;
+					$.mobile.pushStateEnabled = false;
+					$.mobile.defaultPageTransition = "none";
+					$.mobile.defaultDialogTransition = "none";
+					$.mobile.listview.prototype.options.dividerTheme = "b";
+				});
+			</script>
+
+			<script type="text/javascript" src="js/jquery.mobile-1.4.2.js"></script>
+			<script type="text/javascript" src="js/controller.js"></script>
+			<script type="text/javascript" src="js/view.js"></script>
+			<script type="text/javascript" src="js/model.js"></script>
+			<script type="text/javascript" src="js/pour.js"></script>
+			<script type="text/javascript" src="js/functions.js"></script>
+			<script type="text/javascript" src="js/form.js"></script>
+			
+
+
+	</head>
+
+	<body>
+		<section id="home" data-role="page" data-theme="a">
+
+					<div data-role="header" data-position="fixed"  data-tap-toggle="false" class="header-style" data-theme="a">
+						<div class="my-header-grid ui-grid-b">
+								<div class="ui-block-a">
+									<a href=""><img src="img/recycleIcon copy.jpg"  onclick="refresh()"/></a>
+								</div>
+								<div class="ui-block-b">
+									<a href=""><img src="img/DrinkbotLogolight.jpg" /></a>
+								</div>
+								<div class="ui-block-c">
+									<a href="#addSection"><img src="img/addIcon copy1.jpg" /></a>
+								</div>
+						</div>
+					</div>
+					
+					
+					<div data-role="content" id="content" data-theme="a" class="noLine">
+					
+					<div id="homeScreenList">
+					</div>
+					   
+					</div>   
+					
+				<div data-role="footer" data-position="fixed" data-theme="b" class="home-footer-style" data-tap-toggle="false" >
+					<div class="my-footer-grid ui-grid-a">
+								<div class="ui-block-a">
+									<a href="#empty"><img src="img/corkscrew.jpg" /></a>
+								</div>
+								<div class="ui-block-b">
+									<a href="#settingsSection"><img src="img/settings.jpg" /></a>
+								</div>
+						</div>
+				</div>
+		</section>
+		
+		
+
+		<section id="addSection" data-role="page" data-theme="a">
+
+					<div data-role="header" data-position="fixed"  data-tap-toggle="false" class="header-style" data-theme="a">
+						<div class="my-header-grid ui-grid-b">
+								<div class="ui-block-a">
+									<a href=""><img src="img/recycleIcon copy.jpg"  onclick="refresh()"/></a>
+								</div>
+								<div class="ui-block-b">
+									<a href="#home"><img src="img/DrinkbotLogolight.jpg" /></a>
+								</div>
+								<div class="ui-block-c">
+									<a href="#addSection"><img src="img/addIcon copy1.jpg" /></a>
+								</div>
+					
+						</div>
+					</div>
+					
+					<div data-role="content" data-theme="a" class="addSettings">
+						<h2>Add New Drink</h2>
+					   <form name="addDrink" id="addDrinkForm" action="" onsubmit="return addDrink();"  data-ajax="false" >
+									<input type="text" name="drink_name" id="drink_name" value="" placeholder="Drink name"/>
+
+							<div class="ui-grid-a">
+								<div class="ui-block-a"><label for="ingredient1" >Ingredients</label></div>
+								<div class="ui-block-b"><label for="amount1" >Amount(Cl)</label></div>	   
+							</div>
+							<div class="ui-grid-a">
+								<div class="ui-block-a"><input type="text" name="ingredient1" id="ingredient1" value=""/></div>
+								<div class="ui-block-b"><input type="text" name="amount1" id="amount1" value=""/></div>	 
+								<div class="ui-block-a"><input type="text" name="ingredient2" id="ingredient2" value=""/></div>
+								<div class="ui-block-b"><input type="text" name="amount2" id="amount2" value=""/></div>
+								<div class="ui-block-a"><input type="text" name="ingredient3" id="ingredient3" value=""/></div>
+								<div class="ui-block-b"><input type="text" name="amount3" id="amount3" value=""/></div>
+								<div class="ui-block-a"><input type="text" name="ingredient4" id="ingredient4" value=""/></div>
+								<div class="ui-block-b"><input type="text" name="amount4" id="amount4" value=""/></div>
+								<div class="ui-block-a"><input type="text" name="ingredient5" id="ingredient5" value=""/></div>
+								<div class="ui-block-b"><input type="text" name="amount5" id="amount5" value=""/></div>
+								<div class="ui-block-a"><input type="text" name="ingredient6" id="ingredient6" value=""/></div>
+								<div class="ui-block-b"><input type="text" name="amount6" id="amount6" value=""/></div>
+								<div class="ui-block-a"><input type="text" name="ingredient7" id="ingredient7" value=""/></div>
+								<div class="ui-block-b"><input type="text" name="amount7" id="amount7" value=""/></div>								
+							</div>
+						</form>
+					
+				</div>   
+					
+				<div data-role="footer" data-position="fixed" data-theme="b" class="footer-style" data-tap-toggle="false" >			
+					<div class="my-footer-grid ui-grid-a">
+								<div class="ui-block-a" >
+									<a href="" onclick=""  style="color: #9e9bae;" >ERASE</a>
+								</div>
+								<div class="ui-block-b"  >
+									<a href="" onclick=""  style="color: #9e9bae;" >SAVE</a>
+								</div>
+					</div>					
+				</div>
+		</section>		
+		
+		
+		
+		<section id="settingsSection" data-role="page" data-theme="a">
+
+					<div data-role="header" data-position="fixed"  data-tap-toggle="false" class="header-style" data-theme="a">
+						<div class="my-header-grid ui-grid-b">
+								<div class="ui-block-a">
+									<a href=""><img src="img/recycleIcon copy.jpg"  onclick="refresh()"/></a>
+								</div>
+								<div class="ui-block-b">
+									<a href="#home"><img src="img/DrinkbotLogolight.jpg" /></a>
+								</div>
+								<div class="ui-block-c">
+									<a href="#addSection"><img src="img/addIcon copy1.jpg" /></a>
+								</div>
+					
+						</div>
+					</div>
+					
+					
+				<div data-role="content" data-theme="a" class="addSettings contentNoPadding">
+						<p>Settings</p>
+						<p> &nbsp </p>
+					    <form id="settingsForm" name="settingsForm" action="" onsubmit="return settingsFormf();"  data-ajax="false" >
+
+									<br />
+									<label id="unitIDLabel" for="unitID" >UnitID:</label>
+									<input type="text" name="unitID" id="unitID" value="" placeholder="unitID"  />
+									<br />
+									<label id="accessTokenLabel" for="accessToken" >Access Token:</label>
+									<input type="text" name="accessToken" id="accessToken" value="" placeholder="Access Token" />
+									<br />
+									<label id="drinkDatabaseLabel" for="drinkDatabase" >Database:</label>
+									<input  type="text" name="drinkDatabase" id="drinkDatabase" value="" placeholder="Drink Database" />
+
+
+						</form>
+
+				</div>  
+				
+				<div data-role="footer" data-position="fixed" data-theme="b" class="footer-style" data-tap-toggle="false" >			
+					<div class="my-footer-grid ui-grid-a">
+								<div class="ui-block-a" >
+									<a href="" onclick="deleteSettings();"  style="color: #9e9bae;" >ERASE</a>
+								</div>
+								<div class="ui-block-b" >
+									<a href="" onclick="$('#settingsForm').submit();" style="color: #9e9bae;">SAVE</a>
+								</div>
+					</div>					
+				</div>
+				
+		</section>
+		
+		
+		<section id="empty" data-role="page" data-theme="a">
+
+							<div data-role="header" data-position="fixed"  data-tap-toggle="false" class="header-style" data-theme="a">
+								<div class="my-header-grid ui-grid-b">
+										<div class="ui-block-a">
+											<a href=""><img src="img/recycleIcon copy.jpg"  onclick="refresh()"/></a>
+										</div>
+										<div class="ui-block-b">
+											<a href="#home"><img src="img/DrinkbotLogolight.jpg" /></a>
+										</div>
+										<div class="ui-block-c">
+											<a href="#addSection"><img src="img/addIcon copy1.jpg" /></a>
+										</div>
+								</div>
+							</div>
+							
+							
+							<div data-role="content" id="content" data-theme="a" class="noLine">
+							
+							</div>
+							   
+							</div>   
+							
+				<div data-role="footer" data-position="fixed" data-theme="b" class="footer-style" data-tap-toggle="false" >			
+					<div class="my-footer-grid ui-grid-a">
+								<div class="ui-block-a" >
+									<a href="" onclick="deleteSettings();"  style="color: #9e9bae;" >ERASE</a>
+								</div>
+								<div class="ui-block-b" >
+									<a href="" onclick="$('#settingsForm').submit();" style="color: #9e9bae;">SAVE</a>
+								</div>
+					</div>					
+				</div>
+		</section>
+		
+	<script type="text/javascript">
+	$(window).on('load', function () {
+		$(this).trigger('resize');
+	});
+	</script>	
+	</body>
